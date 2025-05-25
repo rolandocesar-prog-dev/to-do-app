@@ -64,6 +64,15 @@ class TaskCard extends StatelessWidget {
                     DateFormat('dd/MM/yyyy HH:mm').format(task.createdAt),
                     style: TextStyle(fontSize: 12, color: AppColors.darkGrey),
                   ),
+                  const SizedBox(width: 8),
+                  // Mostrar ID de tarea para debug
+                  Text(
+                    'ID: ${task.id.substring(0, 8)}...',
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: AppColors.darkGrey.withOpacity(0.5),
+                    ),
+                  ),
                   const Spacer(),
                   _buildActionButtons(context),
                 ],
@@ -130,40 +139,106 @@ class TaskCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (task.status == TaskStatus.pending) ...[
+              // Botón completar (✓)
               _buildActionButton(
                 icon: Icons.check,
                 color: AppColors.success,
-                onPressed:
-                    () => taskProvider.updateTaskStatus(
+                tooltip: 'Marcar como completada',
+                onPressed: () async {
+                  print('=== COMPLETAR TAREA ===');
+                  print('Tarea: ${task.title}');
+                  print('ID: ${task.id}');
+
+                  try {
+                    await taskProvider.updateTaskStatus(
                       task.id,
                       TaskStatus.completed,
-                    ),
+                    );
+
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Tarea "${task.title}" completada'),
+                          backgroundColor: AppColors.success,
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                    }
+                  } catch (e) {
+                    print('Error al completar tarea: $e');
+                  }
+                },
               ),
               const SizedBox(width: 8),
+              // Botón cancelar (✗)
               _buildActionButton(
                 icon: Icons.close,
                 color: AppColors.error,
-                onPressed:
-                    () => taskProvider.updateTaskStatus(
+                tooltip: 'Marcar como cancelada',
+                onPressed: () async {
+                  print('=== CANCELAR TAREA ===');
+                  print('Tarea: ${task.title}');
+                  print('ID: ${task.id}');
+
+                  try {
+                    await taskProvider.updateTaskStatus(
                       task.id,
                       TaskStatus.cancelled,
-                    ),
+                    );
+
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Tarea "${task.title}" cancelada'),
+                          backgroundColor: AppColors.error,
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                    }
+                  } catch (e) {
+                    print('Error al cancelar tarea: $e');
+                  }
+                },
               ),
-            ] else if (task.status != TaskStatus.pending) ...[
+            ] else ...[
+              // Botón restaurar (↻) para tareas completadas o canceladas
               _buildActionButton(
                 icon: Icons.refresh,
                 color: AppColors.warning,
-                onPressed:
-                    () => taskProvider.updateTaskStatus(
+                tooltip: 'Marcar como pendiente',
+                onPressed: () async {
+                  print('=== RESTAURAR TAREA ===');
+                  print('Tarea: ${task.title}');
+                  print('Estado actual: ${task.status}');
+                  print('ID: ${task.id}');
+
+                  try {
+                    await taskProvider.updateTaskStatus(
                       task.id,
                       TaskStatus.pending,
-                    ),
+                    );
+
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Tarea "${task.title}" restaurada'),
+                          backgroundColor: AppColors.warning,
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                    }
+                  } catch (e) {
+                    print('Error al restaurar tarea: $e');
+                  }
+                },
               ),
             ],
             const SizedBox(width: 8),
+            // Botón eliminar (🗑️)
             _buildActionButton(
               icon: Icons.delete,
               color: AppColors.error,
+              tooltip: 'Eliminar tarea',
               onPressed: () => _showDeleteDialog(context, taskProvider),
             ),
           ],
@@ -176,15 +251,22 @@ class TaskCard extends StatelessWidget {
     required IconData icon,
     required Color color,
     required VoidCallback onPressed,
+    String? tooltip,
   }) {
-    return InkWell(
+    Widget button = InkWell(
       onTap: onPressed,
       borderRadius: BorderRadius.circular(16),
       child: Container(
-        padding: const EdgeInsets.all(4),
+        padding: const EdgeInsets.all(6),
         child: Icon(icon, size: 18, color: color),
       ),
     );
+
+    if (tooltip != null) {
+      return Tooltip(message: tooltip, child: button);
+    }
+
+    return button;
   }
 
   void _showDeleteDialog(BuildContext context, TaskProvider taskProvider) {
@@ -193,8 +275,8 @@ class TaskCard extends StatelessWidget {
       builder:
           (context) => AlertDialog(
             title: const Text('Eliminar Tarea'),
-            content: const Text(
-              '¿Estás seguro de que quieres eliminar esta tarea?',
+            content: Text(
+              '¿Estás seguro de que quieres eliminar la tarea "${task.title}"?',
             ),
             actions: [
               TextButton(
@@ -203,8 +285,20 @@ class TaskCard extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () {
+                  print('=== ELIMINAR TAREA ===');
+                  print('Tarea: ${task.title}');
+                  print('ID: ${task.id}');
+
                   taskProvider.deleteTask(task.id);
                   Navigator.pop(context);
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Tarea "${task.title}" eliminada'),
+                      backgroundColor: AppColors.error,
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
                 },
                 style: TextButton.styleFrom(foregroundColor: AppColors.error),
                 child: const Text('Eliminar'),

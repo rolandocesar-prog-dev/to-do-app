@@ -18,37 +18,49 @@ class TaskFilterChips extends StatelessWidget {
               // Filtro "Todas" (muestra pendientes + completadas + canceladas)
               _buildFilterChip(
                 context,
-                'Todas',
+                'Todas (${taskProvider.allTasks.length})',
                 null,
                 taskProvider.isShowingAll,
-                () => taskProvider.showAllTasks(),
+                () {
+                  print('Filter: Showing all tasks');
+                  taskProvider.showAllTasks();
+                },
               ),
               const SizedBox(width: 8),
               // Filtro "Pendientes" (solo pendientes)
               _buildFilterChip(
                 context,
-                'Pendientes',
+                'Pendientes (${taskProvider.pendingCount})',
                 TaskStatus.pending,
                 taskProvider.filterStatus == TaskStatus.pending,
-                () => taskProvider.setFilter(TaskStatus.pending),
+                () {
+                  print('Filter: Showing pending tasks');
+                  taskProvider.setFilter(TaskStatus.pending);
+                },
               ),
               const SizedBox(width: 8),
               // Filtro "Completadas" (solo completadas)
               _buildFilterChip(
                 context,
-                'Completadas',
+                'Completadas (${taskProvider.completedCount})',
                 TaskStatus.completed,
                 taskProvider.filterStatus == TaskStatus.completed,
-                () => taskProvider.setFilter(TaskStatus.completed),
+                () {
+                  print('Filter: Showing completed tasks');
+                  taskProvider.setFilter(TaskStatus.completed);
+                },
               ),
               const SizedBox(width: 8),
               // Filtro "Canceladas" (solo canceladas)
               _buildFilterChip(
                 context,
-                'Canceladas',
+                'Canceladas (${taskProvider.cancelledCount})',
                 TaskStatus.cancelled,
                 taskProvider.filterStatus == TaskStatus.cancelled,
-                () => taskProvider.setFilter(TaskStatus.cancelled),
+                () {
+                  print('Filter: Showing cancelled tasks');
+                  taskProvider.setFilter(TaskStatus.cancelled);
+                },
               ),
             ],
           ),
