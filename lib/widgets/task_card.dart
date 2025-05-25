@@ -70,7 +70,7 @@ class TaskCard extends StatelessWidget {
                     'ID: ${task.id.substring(0, 8)}...',
                     style: TextStyle(
                       fontSize: 10,
-                      color: AppColors.darkGrey.withOpacity(0.5),
+                      color: AppColors.darkGrey.withValues(alpha: 0.5),
                     ),
                   ),
                   const Spacer(),
@@ -110,9 +110,9 @@ class TaskCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

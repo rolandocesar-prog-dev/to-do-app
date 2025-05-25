@@ -102,7 +102,7 @@ class TaskFilterChips extends StatelessWidget {
         color:
             isSelected
                 ? AppColors.primary
-                : AppColors.darkGrey.withOpacity(0.3),
+                : AppColors.darkGrey.withValues(alpha: 0.3),
         width: 1,
       ),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

@@ -239,7 +239,7 @@ class HomeScreen extends StatelessWidget {
             Icon(
               taskProvider.isShowingAll ? Icons.task_alt : Icons.filter_alt,
               size: 80,
-              color: AppColors.darkGrey.withOpacity(0.5),
+              color: AppColors.darkGrey.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 16),
             Text(
@@ -247,7 +247,7 @@ class HomeScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: AppColors.darkGrey.withOpacity(0.8),
+                color: AppColors.darkGrey.withValues(alpha: 0.8),
               ),
               textAlign: TextAlign.center,
             ),
@@ -256,7 +256,7 @@ class HomeScreen extends StatelessWidget {
               emptySubtitle,
               style: TextStyle(
                 fontSize: 14,
-                color: AppColors.darkGrey.withOpacity(0.6),
+                color: AppColors.darkGrey.withValues(alpha: 0.6),
               ),
               textAlign: TextAlign.center,
             ),
@@ -317,7 +317,7 @@ class HomeScreen extends StatelessWidget {
               'Total en memoria: ${taskProvider.allTasks.length} tareas',
               style: TextStyle(
                 fontSize: 12,
-                color: AppColors.darkGrey.withOpacity(0.5),
+                color: AppColors.darkGrey.withValues(alpha: 0.5),
               ),
             ),
           ],
@@ -333,7 +333,7 @@ class HomeScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
