@@ -2,6 +2,32 @@ import 'package:uuid/uuid.dart';
 
 enum TaskStatus { pending, completed, cancelled }
 
+extension TaskStatusExtension on TaskStatus {
+  String get name {
+    switch (this) {
+      case TaskStatus.pending:
+        return 'pending';
+      case TaskStatus.completed:
+        return 'completed';
+      case TaskStatus.cancelled:
+        return 'cancelled';
+    }
+  }
+
+  static TaskStatus fromString(String status) {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return TaskStatus.pending;
+      case 'completed':
+        return TaskStatus.completed;
+      case 'cancelled':
+        return TaskStatus.cancelled;
+      default:
+        return TaskStatus.pending; // Default fallback
+    }
+  }
+}
+
 class Task {
   final String id;
   final String title;
@@ -44,21 +70,43 @@ class Task {
       'description': description,
       'createdAt': createdAt.toIso8601String(),
       'completedAt': completedAt?.toIso8601String(),
-      'status': status.index,
+      'status': status.name, // Usar string en lugar de index
     };
   }
 
   factory Task.fromJson(Map<String, dynamic> json) {
-    return Task(
-      id: json['id'],
-      title: json['title'],
-      description: json['description'],
-      createdAt: DateTime.parse(json['createdAt']),
-      completedAt:
-          json['completedAt'] != null
-              ? DateTime.parse(json['completedAt'])
-              : null,
-      status: TaskStatus.values[json['status']],
-    );
+    try {
+      return Task(
+        id: json['id'] ?? '',
+        title: json['title'] ?? '',
+        description: json['description'] ?? '',
+        createdAt:
+            json['createdAt'] != null
+                ? DateTime.parse(json['createdAt'])
+                : DateTime.now(),
+        completedAt:
+            json['completedAt'] != null
+                ? DateTime.parse(json['completedAt'])
+                : null,
+        status:
+            json['status'] != null
+                ? TaskStatusExtension.fromString(json['status'].toString())
+                : TaskStatus.pending,
+      );
+    } catch (e) {
+      print('Error parsing task from JSON: $e');
+      print('JSON data: $json');
+      // Return a default task in case of error
+      return Task(
+        title: json['title']?.toString() ?? 'Tarea sin título',
+        description: json['description']?.toString() ?? '',
+        status: TaskStatus.pending,
+      );
+    }
+  }
+
+  @override
+  String toString() {
+    return 'Task{id: ${id.substring(0, 8)}, title: $title, status: $status}';
   }
 }

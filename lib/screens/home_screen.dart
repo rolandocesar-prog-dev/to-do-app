@@ -23,7 +23,8 @@ class HomeScreen extends StatelessWidget {
           // Botón de menú debug
           PopupMenuButton<String>(
             icon: const Icon(Icons.bug_report),
-            onSelected: (value) {
+            tooltip: 'Opciones de Debug',
+            onSelected: (value) async {
               final taskProvider = Provider.of<TaskProvider>(
                 context,
                 listen: false,
@@ -32,17 +33,33 @@ class HomeScreen extends StatelessWidget {
                 case 'debug':
                   taskProvider.debugTasksState();
                   break;
+                case 'reload':
+                  await taskProvider.reloadTasks();
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Tareas recargadas desde storage'),
+                        backgroundColor: AppColors.primary,
+                      ),
+                    );
+                  }
+                  break;
                 case 'clear':
                   _showClearDialog(context, taskProvider);
                   break;
                 case 'test':
-                  taskProvider.createTestTasks();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Tareas de prueba creadas'),
-                      backgroundColor: AppColors.success,
-                    ),
-                  );
+                  await taskProvider.createTestTasks();
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Tareas de prueba creadas: 1 pendiente, 1 completada, 1 cancelada',
+                        ),
+                        backgroundColor: AppColors.success,
+                        duration: Duration(seconds: 3),
+                      ),
+                    );
+                  }
                   break;
               }
             },
@@ -54,7 +71,17 @@ class HomeScreen extends StatelessWidget {
                       children: [
                         Icon(Icons.info, color: AppColors.primary),
                         SizedBox(width: 8),
-                        Text('Debug Info'),
+                        Text('Ver Debug Info'),
+                      ],
+                    ),
+                  ),
+                  const PopupMenuItem(
+                    value: 'reload',
+                    child: Row(
+                      children: [
+                        Icon(Icons.refresh, color: AppColors.warning),
+                        SizedBox(width: 8),
+                        Text('Recargar desde Storage'),
                       ],
                     ),
                   ),
@@ -124,6 +151,8 @@ class HomeScreen extends StatelessWidget {
             child: TaskFilterChips(),
           ),
 
+          const SizedBox(height: 16),
+
           // Lista de tareas
           Expanded(
             child: Consumer<TaskProvider>(
@@ -136,83 +165,21 @@ class HomeScreen extends StatelessWidget {
 
                 final tasks = taskProvider.tasks;
 
-                if (tasks.isEmpty) {
-                  String emptyMessage;
-                  if (taskProvider.isShowingAll) {
-                    emptyMessage = 'No hay tareas creadas';
-                  } else {
-                    switch (taskProvider.filterStatus) {
-                      case TaskStatus.pending:
-                        emptyMessage = 'No hay tareas pendientes';
-                        break;
-                      case TaskStatus.completed:
-                        emptyMessage = 'No hay tareas completadas';
-                        break;
-                      case TaskStatus.cancelled:
-                        emptyMessage = 'No hay tareas canceladas';
-                        break;
-                      default:
-                        emptyMessage = 'No hay tareas en esta categoría';
-                    }
-                  }
+                // Debug print cada vez que se renderiza
+                print('HomeScreen: Rendering ${tasks.length} tasks');
+                print(
+                  'HomeScreen: Current filter: ${taskProvider.filterStatus}',
+                );
+                print(
+                  'HomeScreen: Is showing all: ${taskProvider.isShowingAll}',
+                );
 
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.task_alt,
-                          size: 80,
-                          color: AppColors.darkGrey.withOpacity(0.5),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          emptyMessage,
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: AppColors.darkGrey.withOpacity(0.7),
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        // Botones de debug
-                        Wrap(
-                          spacing: 12,
-                          children: [
-                            ElevatedButton.icon(
-                              onPressed: () => taskProvider.debugTasksState(),
-                              icon: const Icon(Icons.info),
-                              label: const Text('Debug Info'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.primary,
-                                foregroundColor: AppColors.dark,
-                              ),
-                            ),
-                            ElevatedButton.icon(
-                              onPressed: () {
-                                taskProvider.createTestTasks();
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Tareas de prueba creadas'),
-                                    backgroundColor: AppColors.success,
-                                  ),
-                                );
-                              },
-                              icon: const Icon(Icons.science),
-                              label: const Text('Crear Pruebas'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.success,
-                                foregroundColor: AppColors.light,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  );
+                if (tasks.isEmpty) {
+                  return _buildEmptyState(taskProvider);
                 }
 
                 return ListView.builder(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   itemCount: tasks.length,
                   itemBuilder: (context, index) {
                     return TaskCard(task: tasks[index]);
@@ -236,30 +203,160 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildEmptyState(TaskProvider taskProvider) {
+    String emptyMessage;
+    String emptySubtitle;
+
+    if (taskProvider.isShowingAll) {
+      emptyMessage = 'No hay tareas creadas';
+      emptySubtitle = 'Crea tu primera tarea o usa las opciones de debug';
+    } else {
+      switch (taskProvider.filterStatus) {
+        case TaskStatus.pending:
+          emptyMessage = 'No hay tareas pendientes';
+          emptySubtitle = 'Todas las tareas están completadas o canceladas';
+          break;
+        case TaskStatus.completed:
+          emptyMessage = 'No hay tareas completadas';
+          emptySubtitle = 'Completa algunas tareas para verlas aquí';
+          break;
+        case TaskStatus.cancelled:
+          emptyMessage = 'No hay tareas canceladas';
+          emptySubtitle = 'Las tareas canceladas aparecerán aquí';
+          break;
+        default:
+          emptyMessage = 'No hay tareas en esta categoría';
+          emptySubtitle = 'Prueba otro filtro o crea nuevas tareas';
+      }
+    }
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              taskProvider.isShowingAll ? Icons.task_alt : Icons.filter_alt,
+              size: 80,
+              color: AppColors.darkGrey.withOpacity(0.5),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              emptyMessage,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: AppColors.darkGrey.withOpacity(0.8),
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              emptySubtitle,
+              style: TextStyle(
+                fontSize: 14,
+                color: AppColors.darkGrey.withOpacity(0.6),
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 32),
+            // Botones de debug mejorados
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              alignment: WrapAlignment.center,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () => taskProvider.debugTasksState(),
+                  icon: const Icon(Icons.info, size: 18),
+                  label: const Text('Debug Info'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: AppColors.dark,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                  ),
+                ),
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    await taskProvider.createTestTasks();
+                  },
+                  icon: const Icon(Icons.science, size: 18),
+                  label: const Text('Crear Pruebas'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.success,
+                    foregroundColor: AppColors.light,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                  ),
+                ),
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    await taskProvider.reloadTasks();
+                  },
+                  icon: const Icon(Icons.refresh, size: 18),
+                  label: const Text('Recargar'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.warning,
+                    foregroundColor: AppColors.dark,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Total en memoria: ${taskProvider.allTasks.length} tareas',
+              style: TextStyle(
+                fontSize: 12,
+                color: AppColors.darkGrey.withOpacity(0.5),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildStatCard(String label, int count, Color color) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Text(
-            count.toString(),
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: color,
+    return Expanded(
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              count.toString(),
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
             ),
           ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: const TextStyle(color: AppColors.light, fontSize: 12),
-        ),
-      ],
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: const TextStyle(
+              color: AppColors.light,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 
@@ -278,15 +375,17 @@ class HomeScreen extends StatelessWidget {
                 child: const Text('Cancelar'),
               ),
               TextButton(
-                onPressed: () {
-                  taskProvider.clearAllTasks();
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Todas las tareas han sido eliminadas'),
-                      backgroundColor: AppColors.error,
-                    ),
-                  );
+                onPressed: () async {
+                  await taskProvider.clearAllTasks();
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Todas las tareas han sido eliminadas'),
+                        backgroundColor: AppColors.error,
+                      ),
+                    );
+                  }
                 },
                 style: TextButton.styleFrom(foregroundColor: AppColors.error),
                 child: const Text('Eliminar Todo'),

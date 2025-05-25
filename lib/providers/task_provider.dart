@@ -9,7 +9,7 @@ class TaskProvider with ChangeNotifier {
   TaskStatus? _filterStatus; // null = mostrar todas las tareas
   bool _isLoading = false;
 
-  // Getter para tareas filtradas con debug mejorado
+  // Getter para tareas filtradas
   List<Task> get tasks {
     if (_filterStatus == null) {
       // Mostrar TODAS las tareas (pendientes, completas, canceladas)
@@ -45,9 +45,10 @@ class TaskProvider with ChangeNotifier {
 
     try {
       _tasks = await _storageService.loadTasks();
+      print('TaskProvider: Loaded ${_tasks.length} tasks');
       debugTasksState();
     } catch (e) {
-      print('Error loading tasks: $e');
+      print('TaskProvider: Error loading tasks: $e');
       _tasks = [];
     }
 
@@ -59,12 +60,12 @@ class TaskProvider with ChangeNotifier {
     final task = Task(title: title, description: description);
     _tasks.insert(0, task);
     await _saveTasks();
+    print('TaskProvider: Added task: ${task.title}');
     notifyListeners();
   }
 
-  // Método updateTaskStatus con debug extensivo
   Future<void> updateTaskStatus(String taskId, TaskStatus newStatus) async {
-    print('=== UPDATING TASK STATUS ===');
+    print('=== TaskProvider: UPDATING TASK STATUS ===');
     print('Task ID: $taskId');
     print('New Status: $newStatus');
 
@@ -96,15 +97,19 @@ class TaskProvider with ChangeNotifier {
 
     print('Updated task: ${updatedTask.title} - Status: ${updatedTask.status}');
 
-    // Guardar cambios
+    // Guardar cambios INMEDIATAMENTE
     await _saveTasks();
 
-    // Verificar que se guardó correctamente
+    // Verificar contadores después de la actualización
     print('Task counts after update:');
     print('- Pending: $pendingCount');
     print('- Completed: $completedCount');
     print('- Cancelled: $cancelledCount');
-    print('========================');
+
+    // Verificar que la tarea está en la lista con el estado correcto
+    final verifyTask = _tasks.firstWhere((t) => t.id == taskId);
+    print('Verification - Task status in list: ${verifyTask.status}');
+    print('=========================================');
 
     // Notificar cambios
     notifyListeners();
@@ -114,7 +119,7 @@ class TaskProvider with ChangeNotifier {
     final taskToDelete = _tasks.firstWhere((task) => task.id == taskId);
     _tasks.removeWhere((task) => task.id == taskId);
     await _saveTasks();
-    print('Deleted task: ${taskToDelete.title}');
+    print('TaskProvider: Deleted task: ${taskToDelete.title}');
     notifyListeners();
   }
 
@@ -122,35 +127,38 @@ class TaskProvider with ChangeNotifier {
   Future<void> _saveTasks() async {
     try {
       await _storageService.saveTasks(_tasks);
-      print('Tasks saved successfully. Total: ${_tasks.length}');
+      print('TaskProvider: Tasks saved successfully. Total: ${_tasks.length}');
     } catch (e) {
-      print('Error saving tasks: $e');
+      print('TaskProvider: Error saving tasks: $e');
     }
   }
 
   // Establecer filtro específico
   void setFilter(TaskStatus status) {
     _filterStatus = status;
-    print('Filter set to: $status');
+    print('TaskProvider: Filter set to: $status');
+    final filteredCount = tasks.length; // Esto ejecuta el getter
+    print('TaskProvider: Filtered tasks count: $filteredCount');
     notifyListeners();
   }
 
   // Mostrar todas las tareas
   void showAllTasks() {
     _filterStatus = null;
-    print('Showing all tasks');
+    print('TaskProvider: Showing all tasks');
+    print('TaskProvider: Total tasks: ${_tasks.length}');
     notifyListeners();
   }
 
   // Método para debug del estado actual
   void debugTasksState() {
-    print('=== CURRENT STATE DEBUG ===');
+    print('=== TASKPROVIDER DEBUG STATE ===');
     print('Total tasks: ${_tasks.length}');
     print('Current filter: $_filterStatus');
     print('Pending: $pendingCount');
     print('Completed: $completedCount');
     print('Cancelled: $cancelledCount');
-    print('Tasks list:');
+    print('Tasks in memory:');
 
     for (int i = 0; i < _tasks.length; i++) {
       final task = _tasks[i];
@@ -158,34 +166,65 @@ class TaskProvider with ChangeNotifier {
         '  [$i] ${task.title} - ${task.status} - ID: ${task.id.substring(0, 8)}...',
       );
     }
-    print('==========================');
+
+    print('Filtered tasks (current view): ${tasks.length}');
+    print('===============================');
+
+    // También debug del storage
+    _storageService.debugStorage();
   }
 
-  // Método para limpiar todas las tareas (útil para testing)
+  // Método para limpiar todas las tareas
   Future<void> clearAllTasks() async {
     _tasks.clear();
     await _saveTasks();
-    print('All tasks cleared');
+    await _storageService.clearStorage(); // Limpiar storage también
+    print('TaskProvider: All tasks cleared');
     notifyListeners();
   }
 
-  // Método para crear tareas de prueba
+  // Método para crear tareas de prueba con TODOS los estados
   Future<void> createTestTasks() async {
     await clearAllTasks();
 
-    // Crear tareas de prueba
-    final testTasks = [
-      Task(title: 'Tarea Pendiente 1', description: 'Descripción pendiente'),
-      Task(title: 'Tarea Pendiente 2', description: 'Otra tarea pendiente'),
-    ];
+    print('=== CREATING TEST TASKS ===');
 
-    _tasks.addAll(testTasks);
+    // Crear 3 tareas diferentes
+    final task1 = Task(
+      title: 'Tarea Pendiente Test',
+      description: 'Esta tarea está pendiente',
+    );
+    final task2 = Task(
+      title: 'Tarea para Completar',
+      description: 'Esta tarea será completada',
+    );
+    final task3 = Task(
+      title: 'Tarea para Cancelar',
+      description: 'Esta tarea será cancelada',
+    );
+
+    _tasks.addAll([task1, task2, task3]);
     await _saveTasks();
 
-    // Marcar una como completada y otra como cancelada
-    await updateTaskStatus(_tasks[0].id, TaskStatus.completed);
-    await updateTaskStatus(_tasks[1].id, TaskStatus.cancelled);
+    print('Created 3 base tasks');
 
-    print('Test tasks created');
+    // Marcar la segunda como completada
+    await updateTaskStatus(task2.id, TaskStatus.completed);
+    print('Marked task2 as completed');
+
+    // Marcar la tercera como cancelada
+    await updateTaskStatus(task3.id, TaskStatus.cancelled);
+    print('Marked task3 as cancelled');
+
+    print('=== TEST TASKS CREATED ===');
+    print('Should have: 1 pending, 1 completed, 1 cancelled');
+    debugTasksState();
+    print('=========================');
+  }
+
+  // Método para recargar tareas desde storage (útil para debug)
+  Future<void> reloadTasks() async {
+    print('TaskProvider: Reloading tasks from storage...');
+    await _loadTasks();
   }
 }

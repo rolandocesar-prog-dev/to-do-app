@@ -13,12 +13,14 @@ class TaskFilterChips extends StatelessWidget {
       builder: (context, taskProvider, child) {
         return SingleChildScrollView(
           scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 4),
           child: Row(
             children: [
-              // Filtro "Todas" (muestra pendientes + completadas + canceladas)
+              // Filtro "Todas"
               _buildFilterChip(
                 context,
-                'Todas (${taskProvider.allTasks.length})',
+                'Todas',
+                taskProvider.allTasks.length,
                 null,
                 taskProvider.isShowingAll,
                 () {
@@ -27,10 +29,11 @@ class TaskFilterChips extends StatelessWidget {
                 },
               ),
               const SizedBox(width: 8),
-              // Filtro "Pendientes" (solo pendientes)
+              // Filtro "Pendientes"
               _buildFilterChip(
                 context,
-                'Pendientes (${taskProvider.pendingCount})',
+                'Pendientes',
+                taskProvider.pendingCount,
                 TaskStatus.pending,
                 taskProvider.filterStatus == TaskStatus.pending,
                 () {
@@ -39,10 +42,11 @@ class TaskFilterChips extends StatelessWidget {
                 },
               ),
               const SizedBox(width: 8),
-              // Filtro "Completadas" (solo completadas)
+              // Filtro "Completadas"
               _buildFilterChip(
                 context,
-                'Completadas (${taskProvider.completedCount})',
+                'Completas',
+                taskProvider.completedCount,
                 TaskStatus.completed,
                 taskProvider.filterStatus == TaskStatus.completed,
                 () {
@@ -51,10 +55,11 @@ class TaskFilterChips extends StatelessWidget {
                 },
               ),
               const SizedBox(width: 8),
-              // Filtro "Canceladas" (solo canceladas)
+              // Filtro "Canceladas"
               _buildFilterChip(
                 context,
-                'Canceladas (${taskProvider.cancelledCount})',
+                'Canceladas',
+                taskProvider.cancelledCount,
                 TaskStatus.cancelled,
                 taskProvider.filterStatus == TaskStatus.cancelled,
                 () {
@@ -72,26 +77,38 @@ class TaskFilterChips extends StatelessWidget {
   Widget _buildFilterChip(
     BuildContext context,
     String label,
+    int count,
     TaskStatus? status,
     bool isSelected,
     VoidCallback onTap,
   ) {
+    // Crear un texto más compacto
+    final displayText = '$label ($count)';
+
     return FilterChip(
-      label: Text(label),
+      label: Text(
+        displayText,
+        style: TextStyle(
+          color: isSelected ? AppColors.dark : AppColors.darkGrey,
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          fontSize: 12, // Reducir tamaño de fuente
+        ),
+      ),
       selected: isSelected,
       onSelected: (_) => onTap(),
       selectedColor: AppColors.primary,
       backgroundColor: AppColors.light,
-      labelStyle: TextStyle(
-        color: isSelected ? AppColors.dark : AppColors.darkGrey,
-        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-      ),
       side: BorderSide(
         color:
             isSelected
                 ? AppColors.primary
                 : AppColors.darkGrey.withOpacity(0.3),
+        width: 1,
       ),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      labelPadding: const EdgeInsets.symmetric(horizontal: 4),
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      visualDensity: VisualDensity.compact,
     );
   }
 }
