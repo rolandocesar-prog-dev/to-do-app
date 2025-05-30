@@ -16,7 +16,7 @@ class HomeScreen extends StatelessWidget {
       backgroundColor: AppColors.lightGrey,
       appBar: AppBar(
         title: const Text(
-          'Mis Tareas',
+          'Mis Tareas Liberales',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         actions: [

@@ -58,22 +58,44 @@ class TaskCard extends StatelessWidget {
 
               Row(
                 children: [
-                  Icon(Icons.access_time, size: 16, color: AppColors.darkGrey),
-                  const SizedBox(width: 4),
-                  Text(
-                    DateFormat('dd/MM/yyyy HH:mm').format(task.createdAt),
-                    style: TextStyle(fontSize: 12, color: AppColors.darkGrey),
-                  ),
-                  const SizedBox(width: 8),
-                  // Mostrar ID de tarea para debug
-                  Text(
-                    'ID: ${task.id.substring(0, 8)}...',
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: AppColors.darkGrey.withValues(alpha: 0.5),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.access_time,
+                          size: 16,
+                          color: AppColors.darkGrey,
+                        ),
+                        const SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
+                            DateFormat(
+                              'dd/MM/yyyy HH:mm',
+                            ).format(task.createdAt),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: AppColors.darkGrey,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        // Mostrar ID de tarea para debug
+                        Flexible(
+                          child: Text(
+                            'ID: ${task.id.substring(0, 8)}...',
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: AppColors.darkGrey.withValues(alpha: 0.5),
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        // const Spacer(),
+                        // _buildActionButtons(context),
+                      ],
                     ),
                   ),
-                  const Spacer(),
+                  const SizedBox(width: 8),
                   _buildActionButtons(context),
                 ],
               ),

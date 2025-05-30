@@ -142,7 +142,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Tarea creada exitosamente'),
+          content: const Text('Tarea creada exitosamente !!!'),
           backgroundColor: AppColors.success,
           behavior: SnackBarBehavior.floating,
         ),
