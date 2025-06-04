@@ -80,16 +80,16 @@ class TaskCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                         // Mostrar ID de tarea para debug
-                        Flexible(
-                          child: Text(
-                            'ID: ${task.id.substring(0, 8)}...',
-                            style: TextStyle(
-                              fontSize: 10,
-                              color: AppColors.darkGrey.withValues(alpha: 0.5),
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
+                        // Flexible(
+                        //   child: Text(
+                        //     'ID: ${task.id.substring(0, 8)}...',
+                        //     style: TextStyle(
+                        //       fontSize: 10,
+                        //       color: AppColors.darkGrey.withValues(alpha: 0.5),
+                        //     ),
+                        //     overflow: TextOverflow.ellipsis,
+                        //   ),
+                        // ),
                         // const Spacer(),
                         // _buildActionButtons(context),
                       ],
