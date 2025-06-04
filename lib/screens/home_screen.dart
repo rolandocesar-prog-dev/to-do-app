@@ -4,6 +4,7 @@ import '../providers/task_provider.dart';
 import '../models/task.dart';
 import '../widgets/task_card.dart';
 import '../widgets/task_filter_chips.dart';
+import '../widgets/watermark_widget.dart'; // ← NUEVA LÍNEA
 import '../theme/app_theme.dart';
 import 'add_task_screen.dart';
 
@@ -12,198 +13,201 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.lightGrey,
-      appBar: AppBar(
-        title: const Text(
-          'Mis Tareas Liberales',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        actions: [
-          // Botón de menú debug
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.bug_report),
-            tooltip: 'Opciones de Debug',
-            onSelected: (value) async {
-              final taskProvider = Provider.of<TaskProvider>(
-                context,
-                listen: false,
-              );
-              switch (value) {
-                case 'debug':
-                  taskProvider.debugTasksState();
-                  break;
-                case 'reload':
-                  await taskProvider.reloadTasks();
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Tareas recargadas desde storage'),
-                        backgroundColor: AppColors.primary,
-                      ),
-                    );
-                  }
-                  break;
-                case 'clear':
-                  _showClearDialog(context, taskProvider);
-                  break;
-                case 'test':
-                  await taskProvider.createTestTasks();
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'Tareas de prueba creadas: 1 pendiente, 1 completada, 1 cancelada',
-                        ),
-                        backgroundColor: AppColors.success,
-                        duration: Duration(seconds: 3),
-                      ),
-                    );
-                  }
-                  break;
-              }
-            },
-            itemBuilder:
-                (context) => [
-                  const PopupMenuItem(
-                    value: 'debug',
-                    child: Row(
-                      children: [
-                        Icon(Icons.info, color: AppColors.primary),
-                        SizedBox(width: 8),
-                        Text('Ver Debug Info'),
-                      ],
-                    ),
-                  ),
-                  const PopupMenuItem(
-                    value: 'reload',
-                    child: Row(
-                      children: [
-                        Icon(Icons.refresh, color: AppColors.warning),
-                        SizedBox(width: 8),
-                        Text('Recargar desde Storage'),
-                      ],
-                    ),
-                  ),
-                  const PopupMenuItem(
-                    value: 'test',
-                    child: Row(
-                      children: [
-                        Icon(Icons.science, color: AppColors.success),
-                        SizedBox(width: 8),
-                        Text('Crear Tareas de Prueba'),
-                      ],
-                    ),
-                  ),
-                  const PopupMenuItem(
-                    value: 'clear',
-                    child: Row(
-                      children: [
-                        Icon(Icons.delete_sweep, color: AppColors.error),
-                        SizedBox(width: 8),
-                        Text('Limpiar Todo'),
-                      ],
-                    ),
-                  ),
-                ],
+    return WatermarkWidget(
+      // ← ENVOLVER TODO EN WATERMARK
+      // Configuración específica para HomeScreen
+      opacity: 0.04,
+      size: 240,
+      alignment: Alignment.center,
+      rotated: false, // Sin rotación en home para mayor sutileza
+      child: Scaffold(
+        backgroundColor: AppColors.lightGrey,
+        appBar: AppBar(
+          title: const Text(
+            'Mis Tareas Liberales',
+            style: TextStyle(fontWeight: FontWeight.bold),
           ),
-        ],
-      ),
-      body: Column(
-        children: [
-          // Panel de estadísticas
-          Container(
-            margin: const EdgeInsets.all(16),
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: AppColors.dark,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Consumer<TaskProvider>(
-              builder: (context, taskProvider, child) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _buildStatCard(
-                      'Pendientes',
-                      taskProvider.pendingCount,
-                      AppColors.warning,
+          actions: [
+            // Tu menú debug existente...
+            PopupMenuButton<String>(
+              icon: const Icon(Icons.bug_report),
+              tooltip: 'Opciones de Debug',
+              onSelected: (value) async {
+                final taskProvider = Provider.of<TaskProvider>(
+                  context,
+                  listen: false,
+                );
+                switch (value) {
+                  case 'debug':
+                    taskProvider.debugTasksState();
+                    break;
+                  case 'reload':
+                    await taskProvider.reloadTasks();
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Tareas recargadas desde storage'),
+                          backgroundColor: AppColors.primary,
+                        ),
+                      );
+                    }
+                    break;
+                  case 'clear':
+                    _showClearDialog(context, taskProvider);
+                    break;
+                  case 'test':
+                    await taskProvider.createTestTasks();
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Tareas de prueba creadas: 1 pendiente, 1 completada, 1 cancelada',
+                          ),
+                          backgroundColor: AppColors.success,
+                          duration: Duration(seconds: 3),
+                        ),
+                      );
+                    }
+                    break;
+                }
+              },
+              itemBuilder:
+                  (context) => [
+                    const PopupMenuItem(
+                      value: 'debug',
+                      child: Row(
+                        children: [
+                          Icon(Icons.info, color: AppColors.primary),
+                          SizedBox(width: 8),
+                          Text('Ver Debug Info'),
+                        ],
+                      ),
                     ),
-                    _buildStatCard(
-                      'Completadas',
-                      taskProvider.completedCount,
-                      AppColors.success,
+                    const PopupMenuItem(
+                      value: 'reload',
+                      child: Row(
+                        children: [
+                          Icon(Icons.refresh, color: AppColors.warning),
+                          SizedBox(width: 8),
+                          Text('Recargar desde Storage'),
+                        ],
+                      ),
                     ),
-                    _buildStatCard(
-                      'Canceladas',
-                      taskProvider.cancelledCount,
-                      AppColors.error,
+                    const PopupMenuItem(
+                      value: 'test',
+                      child: Row(
+                        children: [
+                          Icon(Icons.science, color: AppColors.success),
+                          SizedBox(width: 8),
+                          Text('Crear Tareas de Prueba'),
+                        ],
+                      ),
+                    ),
+                    const PopupMenuItem(
+                      value: 'clear',
+                      child: Row(
+                        children: [
+                          Icon(Icons.delete_sweep, color: AppColors.error),
+                          SizedBox(width: 8),
+                          Text('Limpiar Todo'),
+                        ],
+                      ),
                     ),
                   ],
-                );
-              },
             ),
-          ),
-
-          // Filtros
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            child: TaskFilterChips(),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Lista de tareas
-          Expanded(
-            child: Consumer<TaskProvider>(
-              builder: (context, taskProvider, child) {
-                if (taskProvider.isLoading) {
-                  return const Center(
-                    child: CircularProgressIndicator(color: AppColors.primary),
+          ],
+        ),
+        body: Column(
+          children: [
+            // Panel de estadísticas
+            Container(
+              margin: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: AppColors.dark,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Consumer<TaskProvider>(
+                builder: (context, taskProvider, child) {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _buildStatCard(
+                        'Pendientes',
+                        taskProvider.pendingCount,
+                        AppColors.warning,
+                      ),
+                      _buildStatCard(
+                        'Completadas',
+                        taskProvider.completedCount,
+                        AppColors.success,
+                      ),
+                      _buildStatCard(
+                        'Canceladas',
+                        taskProvider.cancelledCount,
+                        AppColors.error,
+                      ),
+                    ],
                   );
-                }
-
-                final tasks = taskProvider.tasks;
-
-                // Debug print cada vez que se renderiza
-                print('HomeScreen: Rendering ${tasks.length} tasks');
-                print(
-                  'HomeScreen: Current filter: ${taskProvider.filterStatus}',
-                );
-                print(
-                  'HomeScreen: Is showing all: ${taskProvider.isShowingAll}',
-                );
-
-                if (tasks.isEmpty) {
-                  return _buildEmptyState(taskProvider);
-                }
-
-                return ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: tasks.length,
-                  itemBuilder: (context, index) {
-                    return TaskCard(task: tasks[index]);
-                  },
-                );
-              },
+                },
+              ),
             ),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const AddTaskScreen()),
-          );
-        },
-        icon: const Icon(Icons.add),
-        label: const Text('Nueva Tarea'),
+
+            // Filtros
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: TaskFilterChips(),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Lista de tareas
+            Expanded(
+              child: Consumer<TaskProvider>(
+                builder: (context, taskProvider, child) {
+                  if (taskProvider.isLoading) {
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.primary,
+                      ),
+                    );
+                  }
+
+                  final tasks = taskProvider.tasks;
+
+                  if (tasks.isEmpty) {
+                    return _buildEmptyState(taskProvider);
+                  }
+
+                  return ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: tasks.length,
+                    itemBuilder: (context, index) {
+                      return TaskCard(task: tasks[index]);
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const AddTaskScreen()),
+            );
+          },
+          icon: const Icon(Icons.add),
+          label: const Text('Nueva Tarea'),
+        ),
       ),
     );
   }
 
+  // Resto de métodos existentes...
   Widget _buildEmptyState(TaskProvider taskProvider) {
+    // Tu código existente del empty state...
     String emptyMessage;
     String emptySubtitle;
 
@@ -261,7 +265,7 @@ class HomeScreen extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 32),
-            // Botones de debug mejorados
+            // Botones de debug
             Wrap(
               spacing: 12,
               runSpacing: 12,

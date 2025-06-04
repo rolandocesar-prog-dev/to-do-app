@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/task_provider.dart';
+import '../widgets/watermark_widget.dart'; // ← NUEVA LÍNEA
 import '../theme/app_theme.dart';
 
 class AddTaskScreen extends StatefulWidget {
@@ -24,105 +25,113 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Nueva Tarea'),
-        actions: [
-          TextButton(
-            onPressed: _saveTask,
-            child: const Text(
-              'Guardar',
-              style: TextStyle(color: AppColors.primary),
+    return WatermarkWidget(
+      // ← WATERMARK ESPECÍFICO PARA FORMULARIOS
+      // Configuración más sutil para pantallas de formulario
+      opacity: 0.03,
+      size: 180,
+      alignment: Alignment.center,
+      rotated: true, // Ligera rotación para menos interferencia visual
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Nueva Tarea'),
+          actions: [
+            TextButton(
+              onPressed: _saveTask,
+              child: const Text(
+                'Guardar',
+                style: TextStyle(color: AppColors.primary),
+              ),
             ),
-          ),
-        ],
-      ),
-      body: Form(
-        key: _formKey,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Información de la Tarea',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.dark,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-
-                      TextFormField(
-                        controller: _titleController,
-                        decoration: InputDecoration(
-                          labelText: 'Título *',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
+          ],
+        ),
+        body: Form(
+          key: _formKey,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Información de la Tarea',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.dark,
                           ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: const BorderSide(
-                              color: AppColors.primary,
+                        ),
+                        const SizedBox(height: 16),
+
+                        TextFormField(
+                          controller: _titleController,
+                          decoration: InputDecoration(
+                            labelText: 'Título *',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: const BorderSide(
+                                color: AppColors.primary,
+                              ),
                             ),
                           ),
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'El título es obligatorio';
+                            }
+                            return null;
+                          },
                         ),
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'El título es obligatorio';
-                          }
-                          return null;
-                        },
-                      ),
 
-                      const SizedBox(height: 16),
+                        const SizedBox(height: 16),
 
-                      TextFormField(
-                        controller: _descriptionController,
-                        decoration: InputDecoration(
-                          labelText: 'Descripción (opcional)',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: const BorderSide(
-                              color: AppColors.primary,
+                        TextFormField(
+                          controller: _descriptionController,
+                          decoration: InputDecoration(
+                            labelText: 'Descripción (opcional)',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: const BorderSide(
+                                color: AppColors.primary,
+                              ),
                             ),
                           ),
+                          maxLines: 3,
                         ),
-                        maxLines: 3,
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 24),
+                const SizedBox(height: 24),
 
-              ElevatedButton(
-                onPressed: _saveTask,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: AppColors.dark,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                ElevatedButton(
+                  onPressed: _saveTask,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: AppColors.dark,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text(
+                    'Crear Tarea',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),
-                child: const Text(
-                  'Crear Tarea',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
