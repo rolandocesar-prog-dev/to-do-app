@@ -4,7 +4,7 @@ import '../providers/task_provider.dart';
 import '../models/task.dart';
 import '../widgets/task_card.dart';
 import '../widgets/task_filter_chips.dart';
-import '../widgets/watermark_widget.dart'; // ← NUEVA LÍNEA
+import '../widgets/watermark_widget.dart'; // ← AGREGAR ESTA LÍNEA
 import '../theme/app_theme.dart';
 import 'add_task_screen.dart';
 
@@ -14,12 +14,12 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return WatermarkWidget(
-      // ← ENVOLVER TODO EN WATERMARK
-      // Configuración específica para HomeScreen
-      opacity: 0.04,
+      // ← ENVOLVER CON WATERMARK
+      logoPath: 'assets/images/voz_liberal.png', // ← RUTA CORRECTA
+      opacity: 0.15, // TEMPORAL: Más visible para confirmar que funciona
       size: 240,
       alignment: Alignment.center,
-      rotated: false, // Sin rotación en home para mayor sutileza
+      rotated: false,
       child: Scaffold(
         backgroundColor: AppColors.lightGrey,
         appBar: AppBar(
@@ -202,7 +202,7 @@ class HomeScreen extends StatelessWidget {
           label: const Text('Nueva Tarea'),
         ),
       ),
-    );
+    ); // ← CERRAR WatermarkWidget aquí
   }
 
   // Resto de métodos existentes...

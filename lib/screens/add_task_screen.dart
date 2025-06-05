@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/task_provider.dart';
-import '../widgets/watermark_widget.dart'; // ← NUEVA LÍNEA
+import '../widgets/watermark_widget.dart'; // ← AGREGAR ESTA LÍNEA
 import '../theme/app_theme.dart';
 
 class AddTaskScreen extends StatefulWidget {
@@ -26,12 +26,12 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   @override
   Widget build(BuildContext context) {
     return WatermarkWidget(
-      // ← WATERMARK ESPECÍFICO PARA FORMULARIOS
-      // Configuración más sutil para pantallas de formulario
-      opacity: 0.03,
+      // ← ENVOLVER CON WATERMARK
+      logoPath: 'assets/images/voz_liberal.png', // ← RUTA CORRECTA
+      opacity: 0.08, // Un poco más visible para formularios en prueba
       size: 180,
       alignment: Alignment.center,
-      rotated: true, // Ligera rotación para menos interferencia visual
+      rotated: true, // Rotación ligera para menos interferencia
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Nueva Tarea'),
@@ -135,7 +135,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
           ),
         ),
       ),
-    );
+    ); // ← CERRAR WatermarkWidget aquí
   }
 
   void _saveTask() {

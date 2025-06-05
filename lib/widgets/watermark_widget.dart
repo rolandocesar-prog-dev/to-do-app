@@ -11,8 +11,8 @@ class WatermarkWidget extends StatelessWidget {
   const WatermarkWidget({
     super.key,
     required this.child,
-    this.logoPath = 'assets/images/logo_voz_liberal.png',
-    this.opacity = 0.04, // Sutil pero visible
+    this.logoPath = 'assets/images/voz_liberal.png',
+    this.opacity = 0.1, // Sutil pero visible
     this.size = 220,
     this.alignment = Alignment.center,
     this.rotated = false,
@@ -40,22 +40,37 @@ class WatermarkWidget extends StatelessWidget {
                     height: size,
                     fit: BoxFit.contain,
                     errorBuilder: (context, error, stackTrace) {
-                      // Si no encuentra la imagen, muestra un placeholder sutil
+                      // Fallback si no encuentra la imagen - Mostrar logo temporal
+                      print('⚠️ No se pudo cargar el logo: $logoPath');
                       return Container(
                         width: size,
                         height: size,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: Colors.amber.withOpacity(opacity),
-                            width: 2,
+                            color: Colors.amber.withOpacity(opacity * 2),
+                            width: 3,
                           ),
                         ),
-                        child: Icon(
-                          Icons
-                              .campaign, // Icono de megáfono para "Voz Liberal"
-                          size: size * 0.4,
-                          color: Colors.amber.withOpacity(opacity),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.campaign, // Megáfono para "Voz Liberal"
+                              size: size * 0.3,
+                              color: Colors.amber.withOpacity(opacity * 2),
+                            ),
+                            SizedBox(height: size * 0.05),
+                            Text(
+                              'VOZ\nLIBERAL',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: size * 0.08,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.amber.withOpacity(opacity * 2),
+                              ),
+                            ),
+                          ],
                         ),
                       );
                     },
@@ -68,80 +83,4 @@ class WatermarkWidget extends StatelessWidget {
       ],
     );
   }
-}
-
-// Widget alternativo para múltiples marcas de agua
-class MultipleWatermarkWidget extends StatelessWidget {
-  final Widget child;
-  final String? logoPath;
-  final double opacity;
-  final double size;
-
-  const MultipleWatermarkWidget({
-    super.key,
-    required this.child,
-    this.logoPath = 'assets/images/logo_voz_liberal.png',
-    this.opacity = 0.03,
-    this.size = 120,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        child,
-        Positioned.fill(
-          child: IgnorePointer(
-            child: CustomPaint(
-              painter: WatermarkPainter(
-                logoPath: logoPath!,
-                opacity: opacity,
-                size: size,
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class WatermarkPainter extends CustomPainter {
-  final String logoPath;
-  final double opacity;
-  final double size;
-
-  WatermarkPainter({
-    required this.logoPath,
-    required this.opacity,
-    required this.size,
-  });
-
-  @override
-  void paint(Canvas canvas, Size canvasSize) {
-    // Calcular espaciado para el patrón repetido
-    final spacing = size * 1.5;
-    final rows = (canvasSize.height / spacing).ceil() + 1;
-    final cols = (canvasSize.width / spacing).ceil() + 1;
-
-    final paint =
-        Paint()
-          ..color = Colors.grey.withOpacity(opacity)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 1;
-
-    // Dibujar un patrón repetido sutil
-    for (int row = 0; row < rows; row++) {
-      for (int col = 0; col < cols; col++) {
-        final x = col * spacing - size / 2;
-        final y = row * spacing - size / 2;
-
-        // Dibujar un círculo sutil en lugar del logo para el patrón
-        canvas.drawCircle(Offset(x, y), size / 4, paint);
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
