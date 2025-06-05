@@ -16,9 +16,9 @@ class HomeScreen extends StatelessWidget {
     return WatermarkWidget(
       // ← ENVOLVER CON WATERMARK
       logoPath: 'assets/images/voz_liberal.png', // ← RUTA CORRECTA
-      opacity: 0.15, // TEMPORAL: Más visible para confirmar que funciona
-      size: 240,
-      alignment: Alignment.center,
+      opacity: 0.09, // TEMPORAL: Más visible para confirmar que funciona
+      size: 550,
+      alignment: Alignment.bottomCenter,
       rotated: false,
       child: Scaffold(
         backgroundColor: AppColors.lightGrey,

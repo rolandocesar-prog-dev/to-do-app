@@ -29,12 +29,12 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
       // ← ENVOLVER CON WATERMARK
       logoPath: 'assets/images/voz_liberal.png', // ← RUTA CORRECTA
       opacity: 0.08, // Un poco más visible para formularios en prueba
-      size: 180,
-      alignment: Alignment.center,
-      rotated: true, // Rotación ligera para menos interferencia
+      size: 480,
+      alignment: Alignment.bottomCenter,
+      // rotated: true, // Rotación ligera para menos interferencia
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Nueva Tarea'),
+          title: const Text('Nueva Tarea Liberal'),
           actions: [
             TextButton(
               onPressed: _saveTask,
