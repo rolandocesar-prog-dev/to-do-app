@@ -70,7 +70,7 @@ class Task {
       'description': description,
       'createdAt': createdAt.toIso8601String(),
       'completedAt': completedAt?.toIso8601String(),
-      'status': status.name, // Usar string en lugar de index
+      'status': status.name,
     };
   }
 
@@ -94,8 +94,6 @@ class Task {
                 : TaskStatus.pending,
       );
     } catch (e) {
-      print('Error parsing task from JSON: $e');
-      print('JSON data: $json');
       // Return a default task in case of error
       return Task(
         title: json['title']?.toString() ?? 'Tarea sin título',

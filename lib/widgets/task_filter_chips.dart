@@ -24,7 +24,6 @@ class TaskFilterChips extends StatelessWidget {
                 null,
                 taskProvider.isShowingAll,
                 () {
-                  print('Filter: Showing all tasks');
                   taskProvider.showAllTasks();
                 },
               ),
@@ -37,7 +36,6 @@ class TaskFilterChips extends StatelessWidget {
                 TaskStatus.pending,
                 taskProvider.filterStatus == TaskStatus.pending,
                 () {
-                  print('Filter: Showing pending tasks');
                   taskProvider.setFilter(TaskStatus.pending);
                 },
               ),
@@ -50,7 +48,6 @@ class TaskFilterChips extends StatelessWidget {
                 TaskStatus.completed,
                 taskProvider.filterStatus == TaskStatus.completed,
                 () {
-                  print('Filter: Showing completed tasks');
                   taskProvider.setFilter(TaskStatus.completed);
                 },
               ),
@@ -63,7 +60,6 @@ class TaskFilterChips extends StatelessWidget {
                 TaskStatus.cancelled,
                 taskProvider.filterStatus == TaskStatus.cancelled,
                 () {
-                  print('Filter: Showing cancelled tasks');
                   taskProvider.setFilter(TaskStatus.cancelled);
                 },
               ),

@@ -78,20 +78,6 @@ class TaskCard extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        // Mostrar ID de tarea para debug
-                        // Flexible(
-                        //   child: Text(
-                        //     'ID: ${task.id.substring(0, 8)}...',
-                        //     style: TextStyle(
-                        //       fontSize: 10,
-                        //       color: AppColors.darkGrey.withValues(alpha: 0.5),
-                        //     ),
-                        //     overflow: TextOverflow.ellipsis,
-                        //   ),
-                        // ),
-                        // const Spacer(),
-                        // _buildActionButtons(context),
                       ],
                     ),
                   ),
@@ -167,10 +153,6 @@ class TaskCard extends StatelessWidget {
                 color: AppColors.success,
                 tooltip: 'Marcar como completada',
                 onPressed: () async {
-                  print('=== COMPLETAR TAREA ===');
-                  print('Tarea: ${task.title}');
-                  print('ID: ${task.id}');
-
                   try {
                     await taskProvider.updateTaskStatus(
                       task.id,
@@ -187,7 +169,7 @@ class TaskCard extends StatelessWidget {
                       );
                     }
                   } catch (e) {
-                    print('Error al completar tarea: $e');
+                    // Manejar error en producción
                   }
                 },
               ),
@@ -198,10 +180,6 @@ class TaskCard extends StatelessWidget {
                 color: AppColors.error,
                 tooltip: 'Marcar como cancelada',
                 onPressed: () async {
-                  print('=== CANCELAR TAREA ===');
-                  print('Tarea: ${task.title}');
-                  print('ID: ${task.id}');
-
                   try {
                     await taskProvider.updateTaskStatus(
                       task.id,
@@ -218,7 +196,7 @@ class TaskCard extends StatelessWidget {
                       );
                     }
                   } catch (e) {
-                    print('Error al cancelar tarea: $e');
+                    // Manejar error en producción
                   }
                 },
               ),
@@ -229,11 +207,6 @@ class TaskCard extends StatelessWidget {
                 color: AppColors.warning,
                 tooltip: 'Marcar como pendiente',
                 onPressed: () async {
-                  print('=== RESTAURAR TAREA ===');
-                  print('Tarea: ${task.title}');
-                  print('Estado actual: ${task.status}');
-                  print('ID: ${task.id}');
-
                   try {
                     await taskProvider.updateTaskStatus(
                       task.id,
@@ -250,7 +223,7 @@ class TaskCard extends StatelessWidget {
                       );
                     }
                   } catch (e) {
-                    print('Error al restaurar tarea: $e');
+                    // Manejar error en producción
                   }
                 },
               ),
@@ -307,10 +280,6 @@ class TaskCard extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () {
-                  print('=== ELIMINAR TAREA ===');
-                  print('Tarea: ${task.title}');
-                  print('ID: ${task.id}');
-
                   taskProvider.deleteTask(task.id);
                   Navigator.pop(context);
 

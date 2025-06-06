@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/task_provider.dart';
-import '../widgets/watermark_widget.dart'; // ← AGREGAR ESTA LÍNEA
+import '../widgets/watermark_widget.dart';
 import '../theme/app_theme.dart';
 
 class AddTaskScreen extends StatefulWidget {
@@ -26,15 +26,18 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   @override
   Widget build(BuildContext context) {
     return WatermarkWidget(
-      // ← ENVOLVER CON WATERMARK
-      logoPath: 'assets/images/voz_liberal.png', // ← RUTA CORRECTA
-      opacity: 0.08, // Un poco más visible para formularios en prueba
+      logoPath: 'assets/images/voz_liberal.png',
+      opacity: 0.08,
       size: 480,
       alignment: Alignment.bottomCenter,
-      // rotated: true, // Rotación ligera para menos interferencia
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Nueva Tarea Liberal'),
+          titleTextStyle: TextStyle(
+            color: AppColors.primary,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
           actions: [
             TextButton(
               onPressed: _saveTask,
@@ -135,7 +138,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
           ),
         ),
       ),
-    ); // ← CERRAR WatermarkWidget aquí
+    );
   }
 
   void _saveTask() {
@@ -151,7 +154,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Tarea creada exitosamente !!!'),
+          content: const Text('Tarea creada exitosamente'),
           backgroundColor: AppColors.success,
           behavior: SnackBarBehavior.floating,
         ),

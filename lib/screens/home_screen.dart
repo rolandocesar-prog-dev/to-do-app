@@ -4,7 +4,7 @@ import '../providers/task_provider.dart';
 import '../models/task.dart';
 import '../widgets/task_card.dart';
 import '../widgets/task_filter_chips.dart';
-import '../widgets/watermark_widget.dart'; // ← AGREGAR ESTA LÍNEA
+import '../widgets/watermark_widget.dart';
 import '../theme/app_theme.dart';
 import 'add_task_screen.dart';
 
@@ -14,9 +14,8 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return WatermarkWidget(
-      // ← ENVOLVER CON WATERMARK
-      logoPath: 'assets/images/voz_liberal.png', // ← RUTA CORRECTA
-      opacity: 0.09, // TEMPORAL: Más visible para confirmar que funciona
+      logoPath: 'assets/images/voz_liberal.png',
+      opacity: 0.09,
       size: 550,
       alignment: Alignment.bottomCenter,
       rotated: false,
@@ -25,97 +24,11 @@ class HomeScreen extends StatelessWidget {
         appBar: AppBar(
           title: const Text(
             'Mis Tareas Liberales',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          actions: [
-            // Tu menú debug existente...
-            PopupMenuButton<String>(
-              icon: const Icon(Icons.bug_report),
-              tooltip: 'Opciones de Debug',
-              onSelected: (value) async {
-                final taskProvider = Provider.of<TaskProvider>(
-                  context,
-                  listen: false,
-                );
-                switch (value) {
-                  case 'debug':
-                    taskProvider.debugTasksState();
-                    break;
-                  case 'reload':
-                    await taskProvider.reloadTasks();
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Tareas recargadas desde storage'),
-                          backgroundColor: AppColors.primary,
-                        ),
-                      );
-                    }
-                    break;
-                  case 'clear':
-                    _showClearDialog(context, taskProvider);
-                    break;
-                  case 'test':
-                    await taskProvider.createTestTasks();
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            'Tareas de prueba creadas: 1 pendiente, 1 completada, 1 cancelada',
-                          ),
-                          backgroundColor: AppColors.success,
-                          duration: Duration(seconds: 3),
-                        ),
-                      );
-                    }
-                    break;
-                }
-              },
-              itemBuilder:
-                  (context) => [
-                    const PopupMenuItem(
-                      value: 'debug',
-                      child: Row(
-                        children: [
-                          Icon(Icons.info, color: AppColors.primary),
-                          SizedBox(width: 8),
-                          Text('Ver Debug Info'),
-                        ],
-                      ),
-                    ),
-                    const PopupMenuItem(
-                      value: 'reload',
-                      child: Row(
-                        children: [
-                          Icon(Icons.refresh, color: AppColors.warning),
-                          SizedBox(width: 8),
-                          Text('Recargar desde Storage'),
-                        ],
-                      ),
-                    ),
-                    const PopupMenuItem(
-                      value: 'test',
-                      child: Row(
-                        children: [
-                          Icon(Icons.science, color: AppColors.success),
-                          SizedBox(width: 8),
-                          Text('Crear Tareas de Prueba'),
-                        ],
-                      ),
-                    ),
-                    const PopupMenuItem(
-                      value: 'clear',
-                      child: Row(
-                        children: [
-                          Icon(Icons.delete_sweep, color: AppColors.error),
-                          SizedBox(width: 8),
-                          Text('Limpiar Todo'),
-                        ],
-                      ),
-                    ),
-                  ],
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: AppColors.primary,
             ),
-          ],
+          ),
         ),
         body: Column(
           children: [
@@ -202,18 +115,16 @@ class HomeScreen extends StatelessWidget {
           label: const Text('Nueva Tarea'),
         ),
       ),
-    ); // ← CERRAR WatermarkWidget aquí
+    );
   }
 
-  // Resto de métodos existentes...
   Widget _buildEmptyState(TaskProvider taskProvider) {
-    // Tu código existente del empty state...
     String emptyMessage;
     String emptySubtitle;
 
     if (taskProvider.isShowingAll) {
       emptyMessage = 'No hay tareas creadas';
-      emptySubtitle = 'Crea tu primera tarea o usa las opciones de debug';
+      emptySubtitle = 'Crea tu primera tarea con el botón +';
     } else {
       switch (taskProvider.filterStatus) {
         case TaskStatus.pending:
@@ -264,66 +175,6 @@ class HomeScreen extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 32),
-            // Botones de debug
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              alignment: WrapAlignment.center,
-              children: [
-                ElevatedButton.icon(
-                  onPressed: () => taskProvider.debugTasksState(),
-                  icon: const Icon(Icons.info, size: 18),
-                  label: const Text('Debug Info'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: AppColors.dark,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                  ),
-                ),
-                ElevatedButton.icon(
-                  onPressed: () async {
-                    await taskProvider.createTestTasks();
-                  },
-                  icon: const Icon(Icons.science, size: 18),
-                  label: const Text('Crear Pruebas'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.success,
-                    foregroundColor: AppColors.light,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                  ),
-                ),
-                ElevatedButton.icon(
-                  onPressed: () async {
-                    await taskProvider.reloadTasks();
-                  },
-                  icon: const Icon(Icons.refresh, size: 18),
-                  label: const Text('Recargar'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.warning,
-                    foregroundColor: AppColors.dark,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Total en memoria: ${taskProvider.allTasks.length} tareas',
-              style: TextStyle(
-                fontSize: 12,
-                color: AppColors.darkGrey.withValues(alpha: 0.5),
-              ),
-            ),
           ],
         ),
       ),
@@ -361,41 +212,6 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-
-  void _showClearDialog(BuildContext context, TaskProvider taskProvider) {
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('Limpiar todas las tareas'),
-            content: const Text(
-              '¿Estás seguro de que quieres eliminar todas las tareas? Esta acción no se puede deshacer.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancelar'),
-              ),
-              TextButton(
-                onPressed: () async {
-                  await taskProvider.clearAllTasks();
-                  if (context.mounted) {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Todas las tareas han sido eliminadas'),
-                        backgroundColor: AppColors.error,
-                      ),
-                    );
-                  }
-                },
-                style: TextButton.styleFrom(foregroundColor: AppColors.error),
-                child: const Text('Eliminar Todo'),
-              ),
-            ],
-          ),
     );
   }
 }

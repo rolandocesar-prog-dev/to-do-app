@@ -41,7 +41,6 @@ class WatermarkWidget extends StatelessWidget {
                     fit: BoxFit.contain,
                     errorBuilder: (context, error, stackTrace) {
                       // Fallback si no encuentra la imagen - Mostrar logo temporal
-                      print('⚠️ No se pudo cargar el logo: $logoPath');
                       return Container(
                         width: size,
                         height: size,

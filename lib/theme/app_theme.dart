@@ -4,7 +4,8 @@ class AppColors {
   static const Color primary = Color(0xFFFFD700); // Amarillo dorado
   static const Color secondary = Color(0xFFFFF59D); // Amarillo claro
   static const Color accent = Color(0xFFFFE082); // Amarillo suave
-  static const Color dark = Color(0xFF212121); // Negro suave
+  // static const Color dark = Color(0xFF212121);
+  static const Color dark = Color(0xFF000000); // Negro suave
   static const Color darkGrey = Color(0xFF424242);
   static const Color light = Color(0xFFFFFFFF); // Blanco
   static const Color lightGrey = Color(0xFFF5F5F5);
