@@ -7,8 +7,8 @@ class AppColors {
   static const Color accent = Color(0xFF7ED321); // Verde menta fresco
   
   // Colores de superficie - Modo Claro
-  static const Color surfaceLight = Color(0xFFFAFAFA); // Blanco cálido
-  static const Color backgroundLight = Color(0xFFF8F9FA); // Gris muy claro
+  static const Color surfaceLight = Color(0xFFF5F5F5); // Gris muy claro para surfaces
+  static const Color backgroundLight = Color(0xFFECEFF1); // Gris claro con más contraste
   static const Color cardLight = Color(0xFFFFFFFF); // Blanco para tarjetas
   
   // Colores de superficie - Modo Oscuro
@@ -44,19 +44,10 @@ class AppColors {
 }
 
 class AppTheme {
-  // Cache de temas para evitar recreaciones
-  static ThemeData? _cachedLightTheme;
-  static ThemeData? _cachedDarkTheme;
+  // No usar cache para permitir cambios en tiempo real durante desarrollo
+  static ThemeData get lightTheme => _buildLightTheme();
   
-  static ThemeData get lightTheme {
-    _cachedLightTheme ??= _buildLightTheme();
-    return _cachedLightTheme!;
-  }
-  
-  static ThemeData get darkTheme {
-    _cachedDarkTheme ??= _buildDarkTheme();
-    return _cachedDarkTheme!;
-  }
+  static ThemeData get darkTheme => _buildDarkTheme();
   
   static ThemeData _buildLightTheme() {
     return ThemeData(
