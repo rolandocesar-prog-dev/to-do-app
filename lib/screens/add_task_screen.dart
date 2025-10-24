@@ -66,7 +66,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.dark,
+                            color: AppColors.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -122,7 +122,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   onPressed: _saveTask,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
-                    foregroundColor: AppColors.dark,
+                    foregroundColor: AppColors.textPrimary,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),

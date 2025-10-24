@@ -47,7 +47,7 @@ class WatermarkWidget extends StatelessWidget {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: Colors.amber.withOpacity(opacity * 2),
+                            color: Colors.amber.withAlpha((opacity * 2 * 255).round()),
                             width: 3,
                           ),
                         ),
@@ -57,7 +57,7 @@ class WatermarkWidget extends StatelessWidget {
                             Icon(
                               Icons.campaign, // Megáfono para "Voz Liberal"
                               size: size * 0.3,
-                              color: Colors.amber.withOpacity(opacity * 2),
+                              color: Colors.amber.withAlpha((opacity * 2 * 255).round()),
                             ),
                             SizedBox(height: size * 0.05),
                             Text(
@@ -66,7 +66,7 @@ class WatermarkWidget extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: size * 0.08,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.amber.withOpacity(opacity * 2),
+                                color: Colors.amber.withAlpha((opacity * 2 * 255).round()),
                               ),
                             ),
                           ],

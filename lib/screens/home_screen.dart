@@ -20,10 +20,10 @@ class HomeScreen extends StatelessWidget {
       alignment: Alignment.bottomCenter,
       rotated: false,
       child: Scaffold(
-        backgroundColor: AppColors.lightGrey,
+        backgroundColor: AppColors.background,
         appBar: AppBar(
           title: const Text(
-            'Mis Tareas Liberales',
+            'Mis Tareas',
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: AppColors.primary,
@@ -37,7 +37,7 @@ class HomeScreen extends StatelessWidget {
               margin: const EdgeInsets.all(16),
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: AppColors.dark,
+                color: AppColors.textPrimary,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Consumer<TaskProvider>(
@@ -154,7 +154,7 @@ class HomeScreen extends StatelessWidget {
             Icon(
               taskProvider.isShowingAll ? Icons.task_alt : Icons.filter_alt,
               size: 80,
-              color: AppColors.darkGrey.withValues(alpha: 0.5),
+              color: AppColors.textSecondary.withAlpha(128),
             ),
             const SizedBox(height: 16),
             Text(
@@ -162,7 +162,7 @@ class HomeScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: AppColors.darkGrey.withValues(alpha: 0.8),
+                color: AppColors.textSecondary.withAlpha(204),
               ),
               textAlign: TextAlign.center,
             ),
@@ -171,7 +171,7 @@ class HomeScreen extends StatelessWidget {
               emptySubtitle,
               style: TextStyle(
                 fontSize: 14,
-                color: AppColors.darkGrey.withValues(alpha: 0.6),
+                color: AppColors.textSecondary.withAlpha(153),
               ),
               textAlign: TextAlign.center,
             ),
@@ -204,7 +204,7 @@ class HomeScreen extends StatelessWidget {
           Text(
             label,
             style: const TextStyle(
-              color: AppColors.light,
+              color: AppColors.card,
               fontSize: 12,
               fontWeight: FontWeight.w500,
             ),

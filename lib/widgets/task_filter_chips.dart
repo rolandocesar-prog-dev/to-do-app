@@ -85,7 +85,7 @@ class TaskFilterChips extends StatelessWidget {
       label: Text(
         displayText,
         style: TextStyle(
-          color: isSelected ? AppColors.dark : AppColors.darkGrey,
+          color: isSelected ? AppColors.textPrimary : AppColors.textSecondary,
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
           fontSize: 12, // Reducir tamaño de fuente
         ),
@@ -93,12 +93,12 @@ class TaskFilterChips extends StatelessWidget {
       selected: isSelected,
       onSelected: (_) => onTap(),
       selectedColor: AppColors.primary,
-      backgroundColor: AppColors.light,
+      backgroundColor: AppColors.card,
       side: BorderSide(
         color:
             isSelected
                 ? AppColors.primary
-                : AppColors.darkGrey.withValues(alpha: 0.3),
+                : AppColors.textSecondary.withAlpha(77),
         width: 1,
       ),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

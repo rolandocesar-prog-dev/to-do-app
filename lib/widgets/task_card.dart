@@ -28,7 +28,7 @@ class TaskCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.dark,
+                        color: AppColors.textPrimary,
                         decoration:
                             task.status == TaskStatus.completed
                                 ? TextDecoration.lineThrough
@@ -45,7 +45,7 @@ class TaskCard extends StatelessWidget {
                 Text(
                   task.description,
                   style: TextStyle(
-                    color: AppColors.darkGrey,
+                    color: AppColors.textSecondary,
                     decoration:
                         task.status == TaskStatus.completed
                             ? TextDecoration.lineThrough
@@ -64,7 +64,7 @@ class TaskCard extends StatelessWidget {
                         Icon(
                           Icons.access_time,
                           size: 16,
-                          color: AppColors.darkGrey,
+                          color: AppColors.textSecondary,
                         ),
                         const SizedBox(width: 4),
                         Flexible(
@@ -74,7 +74,7 @@ class TaskCard extends StatelessWidget {
                             ).format(task.createdAt),
                             style: TextStyle(
                               fontSize: 12,
-                              color: AppColors.darkGrey,
+                              color: AppColors.textSecondary,
                             ),
                           ),
                         ),
