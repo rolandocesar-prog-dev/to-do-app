@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/task_provider.dart';
-import '../widgets/watermark_widget.dart';
 import '../theme/app_theme.dart';
 
 class AddTaskScreen extends StatefulWidget {
@@ -25,12 +24,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return WatermarkWidget(
-      logoPath: 'assets/images/voz_liberal.png',
-      opacity: 0.08,
-      size: 480,
-      alignment: Alignment.bottomCenter,
-      child: Scaffold(
+    return Scaffold(
         appBar: AppBar(
           title: const Text('Nueva Tarea Liberal'),
           titleTextStyle: TextStyle(
@@ -137,7 +131,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             ),
           ),
         ),
-      ),
     );
   }
 

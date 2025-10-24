@@ -4,10 +4,18 @@ import '../models/task.dart';
 
 class StorageService {
   static const String _tasksKey = 'tasks';
+  
+  // Cache de SharedPreferences para evitar múltiples instancias
+  SharedPreferences? _prefs;
+  
+  Future<SharedPreferences> get _preferences async {
+    _prefs ??= await SharedPreferences.getInstance();
+    return _prefs!;
+  }
 
   Future<List<Task>> loadTasks() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
+      final prefs = await _preferences;
       final tasksJson = prefs.getString(_tasksKey);
 
       if (tasksJson == null || tasksJson.isEmpty) {
@@ -17,13 +25,12 @@ class StorageService {
       final List<dynamic> tasksList = jsonDecode(tasksJson);
       final List<Task> tasks = [];
 
-      for (int i = 0; i < tasksList.length; i++) {
+      for (final taskData in tasksList) {
         try {
-          final task = Task.fromJson(tasksList[i]);
+          final task = Task.fromJson(taskData);
           tasks.add(task);
         } catch (e) {
           // En producción, podrías registrar esto en un servicio de analytics
-          // pero no en la consola
           continue;
         }
       }
@@ -36,21 +43,12 @@ class StorageService {
 
   Future<void> saveTasks(List<Task> tasks) async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-
-      // Convert tasks to JSON
-      final List<Map<String, dynamic>> tasksJson = [];
-      for (int i = 0; i < tasks.length; i++) {
-        try {
-          final taskJson = tasks[i].toJson();
-          tasksJson.add(taskJson);
-        } catch (e) {
-          // En producción, podrías registrar esto en un servicio de analytics
-          continue;
-        }
-      }
-
+      final prefs = await _preferences;
+      
+      // Optimización: usar map directamente
+      final tasksJson = tasks.map((task) => task.toJson()).toList();
       final jsonString = jsonEncode(tasksJson);
+      
       await prefs.setString(_tasksKey, jsonString);
     } catch (e) {
       // En producción, manejar el error apropiadamente

@@ -4,7 +4,6 @@ import '../providers/task_provider.dart';
 import '../models/task.dart';
 import '../widgets/task_card.dart';
 import '../widgets/task_filter_chips.dart';
-import '../widgets/watermark_widget.dart';
 import '../theme/app_theme.dart';
 import 'add_task_screen.dart';
 
@@ -13,13 +12,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return WatermarkWidget(
-      logoPath: 'assets/images/voz_liberal.png',
-      opacity: 0.09,
-      size: 550,
-      alignment: Alignment.bottomCenter,
-      rotated: false,
-      child: Scaffold(
+    return Scaffold(
         backgroundColor: AppColors.background,
         appBar: AppBar(
           title: const Text(
@@ -32,40 +25,9 @@ class HomeScreen extends StatelessWidget {
         ),
         body: Column(
           children: [
-            // Panel de estadísticas
-            Container(
-              margin: const EdgeInsets.all(16),
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: AppColors.textPrimary,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Consumer<TaskProvider>(
-                builder: (context, taskProvider, child) {
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _buildStatCard(
-                        'Pendientes',
-                        taskProvider.pendingCount,
-                        AppColors.warning,
-                      ),
-                      _buildStatCard(
-                        'Completadas',
-                        taskProvider.completedCount,
-                        AppColors.success,
-                      ),
-                      _buildStatCard(
-                        'Canceladas',
-                        taskProvider.cancelledCount,
-                        AppColors.error,
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ),
-
+            // Panel de estadísticas optimizado
+            const _StatsPanel(),
+            
             // Filtros
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),
@@ -74,7 +36,7 @@ class HomeScreen extends StatelessWidget {
 
             const SizedBox(height: 16),
 
-            // Lista de tareas
+            // Lista de tareas optimizada
             Expanded(
               child: Consumer<TaskProvider>(
                 builder: (context, taskProvider, child) {
@@ -89,7 +51,7 @@ class HomeScreen extends StatelessWidget {
                   final tasks = taskProvider.tasks;
 
                   if (tasks.isEmpty) {
-                    return _buildEmptyState(taskProvider);
+                    return _EmptyState(taskProvider: taskProvider);
                   }
 
                   return ListView.builder(
@@ -114,11 +76,105 @@ class HomeScreen extends StatelessWidget {
           icon: const Icon(Icons.add),
           label: const Text('Nueva Tarea'),
         ),
-      ),
     );
   }
 
-  Widget _buildEmptyState(TaskProvider taskProvider) {
+}
+
+class _StatsPanel extends StatelessWidget {
+  const _StatsPanel();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.textPrimary,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Consumer<TaskProvider>(
+        builder: (context, taskProvider, child) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _StatCard(
+                label: 'Pendientes',
+                count: taskProvider.pendingCount,
+                color: AppColors.warning,
+              ),
+              _StatCard(
+                label: 'Completadas',
+                count: taskProvider.completedCount,
+                color: AppColors.success,
+              ),
+              _StatCard(
+                label: 'Canceladas',
+                count: taskProvider.cancelledCount,
+                color: AppColors.error,
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _StatCard extends StatelessWidget {
+  final String label;
+  final int count;
+  final Color color;
+  
+  const _StatCard({
+    required this.label,
+    required this.count,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              count.toString(),
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: const TextStyle(
+              color: AppColors.card,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _EmptyState extends StatelessWidget {
+  final TaskProvider taskProvider;
+  
+  const _EmptyState({required this.taskProvider});
+
+  @override
+  Widget build(BuildContext context) {
     String emptyMessage;
     String emptySubtitle;
 
@@ -154,7 +210,7 @@ class HomeScreen extends StatelessWidget {
             Icon(
               taskProvider.isShowingAll ? Icons.task_alt : Icons.filter_alt,
               size: 80,
-              color: AppColors.textSecondary.withAlpha(128),
+              color: AppColors.textSecondary.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 16),
             Text(
@@ -162,7 +218,7 @@ class HomeScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textSecondary.withAlpha(204),
+                color: AppColors.textSecondary.withValues(alpha: 0.8),
               ),
               textAlign: TextAlign.center,
             ),
@@ -171,46 +227,12 @@ class HomeScreen extends StatelessWidget {
               emptySubtitle,
               style: TextStyle(
                 fontSize: 14,
-                color: AppColors.textSecondary.withAlpha(153),
+                color: AppColors.textSecondary.withValues(alpha: 0.6),
               ),
               textAlign: TextAlign.center,
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildStatCard(String label, int count, Color color) {
-    return Expanded(
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              count.toString(),
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: color,
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: const TextStyle(
-              color: AppColors.card,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
       ),
     );
   }

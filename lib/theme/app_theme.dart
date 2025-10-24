@@ -29,7 +29,15 @@ class AppColors {
 }
 
 class AppTheme {
+  // Cache del tema para evitar recreaciones
+  static ThemeData? _cachedTheme;
+  
   static ThemeData get theme {
+    _cachedTheme ??= _buildTheme();
+    return _cachedTheme!;
+  }
+  
+  static ThemeData _buildTheme() {
     return ThemeData(
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(

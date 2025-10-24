@@ -20,220 +20,148 @@ class TaskCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      task.title,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                        decoration:
-                            task.status == TaskStatus.completed
-                                ? TextDecoration.lineThrough
-                                : null,
-                      ),
-                    ),
-                  ),
-                  _buildStatusChip(),
-                ],
-              ),
-
-              if (task.description.isNotEmpty) ...[
-                const SizedBox(height: 8),
-                Text(
-                  task.description,
-                  style: TextStyle(
-                    color: AppColors.textSecondary,
-                    decoration:
-                        task.status == TaskStatus.completed
-                            ? TextDecoration.lineThrough
-                            : null,
-                  ),
-                ),
-              ],
-
+              _TaskHeader(task: task),
+              if (task.description.isNotEmpty) 
+                _TaskDescription(task: task),
               const SizedBox(height: 12),
-
-              Row(
-                children: [
-                  Expanded(
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.access_time,
-                          size: 16,
-                          color: AppColors.textSecondary,
-                        ),
-                        const SizedBox(width: 4),
-                        Flexible(
-                          child: Text(
-                            DateFormat(
-                              'dd/MM/yyyy HH:mm',
-                            ).format(task.createdAt),
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  _buildActionButtons(context),
-                ],
-              ),
+              _TaskActions(task: task),
             ],
           ),
         ),
       ),
     );
   }
+}
 
-  Widget _buildStatusChip() {
-    Color color;
-    String label;
-    IconData icon;
+class _TaskHeader extends StatelessWidget {
+  final Task task;
+  
+  const _TaskHeader({required this.task});
 
-    switch (task.status) {
-      case TaskStatus.pending:
-        color = AppColors.warning;
-        label = 'Pendiente';
-        icon = Icons.schedule;
-        break;
-      case TaskStatus.completed:
-        color = AppColors.success;
-        label = 'Completada';
-        icon = Icons.check_circle;
-        break;
-      case TaskStatus.cancelled:
-        color = AppColors.error;
-        label = 'Cancelada';
-        icon = Icons.cancel;
-        break;
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 14, color: color),
-          const SizedBox(width: 4),
-          Text(
-            label,
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            task.title,
             style: TextStyle(
-              fontSize: 12,
-              color: color,
-              fontWeight: FontWeight.w500,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+              decoration: task.status == TaskStatus.completed
+                  ? TextDecoration.lineThrough
+                  : null,
             ),
           ),
-        ],
+        ),
+        _StatusChip(status: task.status),
+      ],
+    );
+  }
+}
+
+class _TaskDescription extends StatelessWidget {
+  final Task task;
+  
+  const _TaskDescription({required this.task});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Text(
+        task.description,
+        style: TextStyle(
+          color: AppColors.textSecondary,
+          decoration: task.status == TaskStatus.completed
+              ? TextDecoration.lineThrough
+              : null,
+        ),
       ),
     );
   }
+}
 
-  Widget _buildActionButtons(BuildContext context) {
+class _TaskActions extends StatelessWidget {
+  final Task task;
+  
+  const _TaskActions({required this.task});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        _TaskDate(task: task),
+        const Spacer(),
+        _TaskButtons(task: task),
+      ],
+    );
+  }
+}
+
+class _TaskDate extends StatelessWidget {
+  final Task task;
+  
+  const _TaskDate({required this.task});
+
+  @override
+  Widget build(BuildContext context) {
+    final dateFormat = DateFormat('dd/MM/yyyy');
+    final timeFormat = DateFormat('HH:mm');
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Creada: ${dateFormat.format(task.createdAt)}',
+          style: const TextStyle(
+            fontSize: 12,
+            color: AppColors.textSecondary,
+          ),
+        ),
+        if (task.completedAt != null)
+          Text(
+            'Completada: ${dateFormat.format(task.completedAt!)} a las ${timeFormat.format(task.completedAt!)}',
+            style: const TextStyle(
+              fontSize: 12,
+              color: AppColors.success,
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _TaskButtons extends StatelessWidget {
+  final Task task;
+  
+  const _TaskButtons({required this.task});
+
+  @override
+  Widget build(BuildContext context) {
     return Consumer<TaskProvider>(
       builder: (context, taskProvider, child) {
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             if (task.status == TaskStatus.pending) ...[
-              // Botón completar (✓)
-              _buildActionButton(
+              _ActionButton(
                 icon: Icons.check,
                 color: AppColors.success,
-                tooltip: 'Marcar como completada',
-                onPressed: () async {
-                  try {
-                    await taskProvider.updateTaskStatus(
-                      task.id,
-                      TaskStatus.completed,
-                    );
-
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Tarea "${task.title}" completada'),
-                          backgroundColor: AppColors.success,
-                          duration: const Duration(seconds: 2),
-                        ),
-                      );
-                    }
-                  } catch (e) {
-                    // Manejar error en producción
-                  }
-                },
+                onPressed: () => taskProvider.updateTaskStatus(task.id, TaskStatus.completed),
               ),
               const SizedBox(width: 8),
-              // Botón cancelar (✗)
-              _buildActionButton(
-                icon: Icons.close,
+              _ActionButton(
+                icon: Icons.cancel,
                 color: AppColors.error,
-                tooltip: 'Marcar como cancelada',
-                onPressed: () async {
-                  try {
-                    await taskProvider.updateTaskStatus(
-                      task.id,
-                      TaskStatus.cancelled,
-                    );
-
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Tarea "${task.title}" cancelada'),
-                          backgroundColor: AppColors.error,
-                          duration: const Duration(seconds: 2),
-                        ),
-                      );
-                    }
-                  } catch (e) {
-                    // Manejar error en producción
-                  }
-                },
-              ),
-            ] else ...[
-              // Botón restaurar (↻) para tareas completadas o canceladas
-              _buildActionButton(
-                icon: Icons.refresh,
-                color: AppColors.warning,
-                tooltip: 'Marcar como pendiente',
-                onPressed: () async {
-                  try {
-                    await taskProvider.updateTaskStatus(
-                      task.id,
-                      TaskStatus.pending,
-                    );
-
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Tarea "${task.title}" restaurada'),
-                          backgroundColor: AppColors.warning,
-                          duration: const Duration(seconds: 2),
-                        ),
-                      );
-                    }
-                  } catch (e) {
-                    // Manejar error en producción
-                  }
-                },
+                onPressed: () => taskProvider.updateTaskStatus(task.id, TaskStatus.cancelled),
               ),
             ],
             const SizedBox(width: 8),
-            // Botón eliminar (🗑️)
-            _buildActionButton(
+            _ActionButton(
               icon: Icons.delete,
               color: AppColors.error,
-              tooltip: 'Eliminar tarea',
               onPressed: () => _showDeleteDialog(context, taskProvider),
             ),
           ],
@@ -242,60 +170,91 @@ class TaskCard extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButton({
-    required IconData icon,
-    required Color color,
-    required VoidCallback onPressed,
-    String? tooltip,
-  }) {
-    Widget button = InkWell(
-      onTap: onPressed,
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        padding: const EdgeInsets.all(6),
-        child: Icon(icon, size: 18, color: color),
-      ),
-    );
-
-    if (tooltip != null) {
-      return Tooltip(message: tooltip, child: button);
-    }
-
-    return button;
-  }
-
   void _showDeleteDialog(BuildContext context, TaskProvider taskProvider) {
     showDialog(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('Eliminar Tarea'),
-            content: Text(
-              '¿Estás seguro de que quieres eliminar la tarea "${task.title}"?',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancelar'),
-              ),
-              TextButton(
-                onPressed: () {
-                  taskProvider.deleteTask(task.id);
-                  Navigator.pop(context);
-
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Tarea "${task.title}" eliminada'),
-                      backgroundColor: AppColors.error,
-                      duration: const Duration(seconds: 2),
-                    ),
-                  );
-                },
-                style: TextButton.styleFrom(foregroundColor: AppColors.error),
-                child: const Text('Eliminar'),
-              ),
-            ],
+      builder: (context) => AlertDialog(
+        title: const Text('Eliminar Tarea'),
+        content: const Text('¿Estás seguro de que quieres eliminar esta tarea?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
           ),
+          TextButton(
+            onPressed: () {
+              taskProvider.deleteTask(task.id);
+              Navigator.pop(context);
+            },
+            child: const Text('Eliminar'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ActionButton extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final VoidCallback onPressed;
+  
+  const _ActionButton({
+    required this.icon,
+    required this.color,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: onPressed,
+      icon: Icon(icon, color: color),
+      iconSize: 20,
+    );
+  }
+}
+
+class _StatusChip extends StatelessWidget {
+  final TaskStatus status;
+  
+  const _StatusChip({required this.status});
+
+  @override
+  Widget build(BuildContext context) {
+    Color chipColor;
+    String statusText;
+
+    switch (status) {
+      case TaskStatus.pending:
+        chipColor = AppColors.warning;
+        statusText = 'Pendiente';
+        break;
+      case TaskStatus.completed:
+        chipColor = AppColors.success;
+        statusText = 'Completada';
+        break;
+      case TaskStatus.cancelled:
+        chipColor = AppColors.error;
+        statusText = 'Cancelada';
+        break;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: chipColor.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: chipColor.withValues(alpha: 0.3)),
+      ),
+      child: Text(
+        statusText,
+        style: TextStyle(
+          color: chipColor,
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
     );
   }
 }
