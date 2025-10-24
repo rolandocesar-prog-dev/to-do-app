@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import '../models/task.dart';
 import '../providers/task_provider.dart';
 import '../theme/app_theme.dart';
+import '../screens/edit_task_screen.dart';
+import '../utils/ui_utils.dart';
 
 class TaskCard extends StatelessWidget {
   final Task task;
@@ -48,7 +50,7 @@ class _TaskHeader extends StatelessWidget {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+              color: Theme.of(context).colorScheme.onSurface,
               decoration: task.status == TaskStatus.completed
                   ? TextDecoration.lineThrough
                   : null,
@@ -73,7 +75,7 @@ class _TaskDescription extends StatelessWidget {
       child: Text(
         task.description,
         style: TextStyle(
-          color: AppColors.textSecondary,
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
           decoration: task.status == TaskStatus.completed
               ? TextDecoration.lineThrough
               : null,
@@ -115,15 +117,15 @@ class _TaskDate extends StatelessWidget {
       children: [
         Text(
           'Creada: ${dateFormat.format(task.createdAt)}',
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
-            color: AppColors.textSecondary,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
           ),
         ),
         if (task.completedAt != null)
           Text(
             'Completada: ${dateFormat.format(task.completedAt!)} a las ${timeFormat.format(task.completedAt!)}',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               color: AppColors.success,
             ),
@@ -147,15 +149,21 @@ class _TaskButtons extends StatelessWidget {
           children: [
             if (task.status == TaskStatus.pending) ...[
               _ActionButton(
+                icon: Icons.edit,
+                color: AppColors.info,
+                onPressed: () => _showEditConfirmation(context, taskProvider),
+              ),
+              const SizedBox(width: 8),
+              _ActionButton(
                 icon: Icons.check,
                 color: AppColors.success,
-                onPressed: () => taskProvider.updateTaskStatus(task.id, TaskStatus.completed),
+                onPressed: () => _showCompleteConfirmation(context, taskProvider),
               ),
               const SizedBox(width: 8),
               _ActionButton(
                 icon: Icons.cancel,
                 color: AppColors.error,
-                onPressed: () => taskProvider.updateTaskStatus(task.id, TaskStatus.cancelled),
+                onPressed: () => _showCancelConfirmation(context, taskProvider),
               ),
             ],
             const SizedBox(width: 8),
@@ -170,27 +178,91 @@ class _TaskButtons extends StatelessWidget {
     );
   }
 
-  void _showDeleteDialog(BuildContext context, TaskProvider taskProvider) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Eliminar Tarea'),
-        content: const Text('¿Estás seguro de que quieres eliminar esta tarea?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () {
-              taskProvider.deleteTask(task.id);
-              Navigator.pop(context);
-            },
-            child: const Text('Eliminar'),
-          ),
-        ],
-      ),
+  void _showEditConfirmation(BuildContext context, TaskProvider taskProvider) async {
+    final confirmed = await UIUtils.showConfirmDialog(
+      context,
+      title: 'Editar Tarea',
+      message: '¿Deseas editar esta tarea?',
+      confirmText: 'Editar',
+      cancelText: 'Cancelar',
+      icon: Icons.edit_rounded,
+      iconColor: AppColors.info,
     );
+
+    if (confirmed == true && context.mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => EditTaskScreen(task: task),
+        ),
+      );
+    }
+  }
+
+  void _showCompleteConfirmation(BuildContext context, TaskProvider taskProvider) async {
+    final confirmed = await UIUtils.showConfirmDialog(
+      context,
+      title: 'Completar Tarea',
+      message: '¿Marcar esta tarea como completada?',
+      confirmText: 'Completar',
+      cancelText: 'Cancelar',
+      icon: Icons.check_circle_rounded,
+      iconColor: AppColors.success,
+    );
+
+    if (confirmed == true && context.mounted) {
+      taskProvider.updateTaskStatus(task.id, TaskStatus.completed);
+      
+      UIUtils.showCustomSnackBar(
+        context,
+        message: '¡Tarea completada!',
+        type: SnackBarType.success,
+      );
+    }
+  }
+
+  void _showCancelConfirmation(BuildContext context, TaskProvider taskProvider) async {
+    final confirmed = await UIUtils.showConfirmDialog(
+      context,
+      title: 'Cancelar Tarea',
+      message: '¿Deseas cancelar esta tarea? No podrás reactivarla después.',
+      confirmText: 'Cancelar Tarea',
+      cancelText: 'Volver',
+      icon: Icons.cancel_rounded,
+      isDangerous: true,
+    );
+
+    if (confirmed == true && context.mounted) {
+      taskProvider.updateTaskStatus(task.id, TaskStatus.cancelled);
+      
+      UIUtils.showCustomSnackBar(
+        context,
+        message: 'Tarea cancelada',
+        type: SnackBarType.warning,
+      );
+    }
+  }
+
+  void _showDeleteDialog(BuildContext context, TaskProvider taskProvider) async {
+    final confirmed = await UIUtils.showConfirmDialog(
+      context,
+      title: 'Eliminar Tarea',
+      message: '¿Estás seguro de que deseas eliminar esta tarea? Esta acción no se puede deshacer.',
+      confirmText: 'Eliminar',
+      cancelText: 'Cancelar',
+      icon: Icons.delete_rounded,
+      isDangerous: true,
+    );
+
+    if (confirmed == true && context.mounted) {
+      taskProvider.deleteTask(task.id);
+      
+      UIUtils.showCustomSnackBar(
+        context,
+        message: 'Tarea eliminada correctamente',
+        type: SnackBarType.success,
+      );
+    }
   }
 }
 

@@ -15,7 +15,7 @@ class TaskProvider with ChangeNotifier {
   int? _cachedCancelledCount;
   
   // Cache para tareas filtradas
-  Map<TaskStatus?, List<Task>> _filteredTasksCache = {};
+  final Map<TaskStatus?, List<Task>> _filteredTasksCache = {};
 
   // Getter para tareas filtradas con cache
   List<Task> get tasks {
@@ -38,23 +38,17 @@ class TaskProvider with ChangeNotifier {
 
   // Contadores optimizados con cache
   int get pendingCount {
-    if (_cachedPendingCount == null) {
-      _cachedPendingCount = _tasks.where((t) => t.status == TaskStatus.pending).length;
-    }
+    _cachedPendingCount ??= _tasks.where((t) => t.status == TaskStatus.pending).length;
     return _cachedPendingCount!;
   }
   
   int get completedCount {
-    if (_cachedCompletedCount == null) {
-      _cachedCompletedCount = _tasks.where((t) => t.status == TaskStatus.completed).length;
-    }
+    _cachedCompletedCount ??= _tasks.where((t) => t.status == TaskStatus.completed).length;
     return _cachedCompletedCount!;
   }
   
   int get cancelledCount {
-    if (_cachedCancelledCount == null) {
-      _cachedCancelledCount = _tasks.where((t) => t.status == TaskStatus.cancelled).length;
-    }
+    _cachedCancelledCount ??= _tasks.where((t) => t.status == TaskStatus.cancelled).length;
     return _cachedCancelledCount!;
   }
 
@@ -80,6 +74,27 @@ class TaskProvider with ChangeNotifier {
   Future<void> addTask(String title, String description) async {
     final task = Task(title: title, description: description);
     _tasks.insert(0, task);
+    _invalidateCache();
+    await _saveTasks();
+    notifyListeners();
+  }
+
+  Future<void> editTask(String taskId, String title, String description) async {
+    final taskIndex = _tasks.indexWhere((task) => task.id == taskId);
+
+    if (taskIndex == -1) return;
+
+    final oldTask = _tasks[taskIndex];
+    
+    // Solo permitir editar tareas pendientes
+    if (oldTask.status != TaskStatus.pending) return;
+
+    final updatedTask = oldTask.copyWith(
+      title: title,
+      description: description,
+    );
+
+    _tasks[taskIndex] = updatedTask;
     _invalidateCache();
     await _saveTasks();
     notifyListeners();

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/task_provider.dart';
 import '../theme/app_theme.dart';
+import '../utils/ui_utils.dart';
 
 class AddTaskScreen extends StatefulWidget {
   const AddTaskScreen({super.key});
@@ -57,10 +58,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                       children: [
                         Text(
                           'Información de la Tarea',
-                          style: TextStyle(
+                          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                             fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -115,12 +114,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 ElevatedButton(
                   onPressed: _saveTask,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: AppColors.textPrimary,
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
                   ),
                   child: const Text(
                     'Crear Tarea',
@@ -145,12 +139,10 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
 
       Navigator.pop(context);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Tarea creada exitosamente'),
-          backgroundColor: AppColors.success,
-          behavior: SnackBarBehavior.floating,
-        ),
+      UIUtils.showCustomSnackBar(
+        context,
+        message: '¡Tarea creada exitosamente!',
+        type: SnackBarType.success,
       );
     }
   }

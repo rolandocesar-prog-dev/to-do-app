@@ -78,27 +78,29 @@ class TaskFilterChips extends StatelessWidget {
     bool isSelected,
     VoidCallback onTap,
   ) {
-    // Crear un texto más compacto
+    final theme = Theme.of(context);
     final displayText = '$label ($count)';
 
     return FilterChip(
       label: Text(
         displayText,
         style: TextStyle(
-          color: isSelected ? AppColors.textPrimary : AppColors.textSecondary,
+          color: isSelected 
+              ? theme.colorScheme.onPrimary
+              : theme.colorScheme.onSurface.withValues(alpha: 0.7),
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          fontSize: 12, // Reducir tamaño de fuente
+          fontSize: 12,
         ),
       ),
       selected: isSelected,
       onSelected: (_) => onTap(),
       selectedColor: AppColors.primary,
-      backgroundColor: AppColors.card,
+      backgroundColor: theme.colorScheme.surface,
       side: BorderSide(
         color:
             isSelected
                 ? AppColors.primary
-                : AppColors.textSecondary.withAlpha(77),
+                : theme.colorScheme.onSurface.withValues(alpha: 0.3),
         width: 1,
       ),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

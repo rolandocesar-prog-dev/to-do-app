@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/task_provider.dart';
+import '../providers/theme_provider.dart';
 import '../models/task.dart';
 import '../widgets/task_card.dart';
 import '../widgets/task_filter_chips.dart';
@@ -13,15 +14,27 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
           title: const Text(
             'Mis Tareas',
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              color: AppColors.primary,
             ),
           ),
+          actions: [
+            Consumer<ThemeProvider>(
+              builder: (context, themeProvider, child) {
+                return IconButton(
+                  onPressed: () => themeProvider.toggleTheme(),
+                  icon: Icon(
+                    themeProvider.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                  ),
+                  tooltip: 'Cambiar tema (${themeProvider.themeModeName})',
+                );
+              },
+            ),
+          ],
         ),
         body: Column(
           children: [
@@ -90,7 +103,7 @@ class _StatsPanel extends StatelessWidget {
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.textPrimary,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Consumer<TaskProvider>(
@@ -155,8 +168,8 @@ class _StatCard extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             label,
-            style: const TextStyle(
-              color: AppColors.card,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
               fontSize: 12,
               fontWeight: FontWeight.w500,
             ),
@@ -210,7 +223,7 @@ class _EmptyState extends StatelessWidget {
             Icon(
               taskProvider.isShowingAll ? Icons.task_alt : Icons.filter_alt,
               size: 80,
-              color: AppColors.textSecondary.withValues(alpha: 0.5),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 16),
             Text(
@@ -218,7 +231,7 @@ class _EmptyState extends StatelessWidget {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textSecondary.withValues(alpha: 0.8),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
               ),
               textAlign: TextAlign.center,
             ),
@@ -227,7 +240,7 @@ class _EmptyState extends StatelessWidget {
               emptySubtitle,
               style: TextStyle(
                 fontSize: 14,
-                color: AppColors.textSecondary.withValues(alpha: 0.6),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
               ),
               textAlign: TextAlign.center,
             ),
@@ -237,3 +250,4 @@ class _EmptyState extends StatelessWidget {
     );
   }
 }
+
