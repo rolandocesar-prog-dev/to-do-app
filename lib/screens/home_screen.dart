@@ -68,7 +68,11 @@ class HomeScreen extends StatelessWidget {
                   }
 
                   return ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.only(
+                      left: 16,
+                      right: 16,
+                      bottom: 80, // Espacio para el FAB
+                    ),
                     itemCount: tasks.length,
                     itemBuilder: (context, index) {
                       return TaskCard(task: tasks[index]);
